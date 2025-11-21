@@ -18,6 +18,7 @@ public class Book {
         this.review = new ArrayList();
     }
 
+    // 책 정보 저장 1번 기능
     public void BookSave() {
         while(true) {
             System.out.println("-----------------");
@@ -36,6 +37,7 @@ public class Book {
         }
     }
 
+    //책 검색 & 출력 2번 기능
     public void BookSearch() {
         while(true) {
             System.out.println("-----------------");
@@ -71,6 +73,7 @@ public class Book {
         }
     }
 
+    //책 후기 저장 3번 기능
     public void BookReview() {
         System.out.println("-----------------");
         System.out.print("후기 작성할 도서명: ");
