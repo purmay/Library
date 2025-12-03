@@ -1,3 +1,4 @@
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -9,6 +10,8 @@ public class Book {
 
     static Scanner sc = new Scanner(System.in);
     static ArrayList<Book> books = new ArrayList<>();
+
+    private static final String FILE_NAME = "books.txt";
 
     public Book(String writer, String name, String number) {
         this.writer = writer;
@@ -43,26 +46,21 @@ public class Book {
 
             boolean found = false;
 
-            for (int i = 0; i < books.size(); i++) {
-                Book b = books.get(i);
+            for (Book b : books) {
+                if (b.name.contains(keyword)) {
+                    System.out.println("==== 검색 결과 ====");
+                    System.out.println("저자: " + b.writer);
+                    System.out.println("도서명: " + b.name);
+                    System.out.println("도서 번호: " + b.number);
 
-                for (int j = 0; j < 1; j++) {
-                    if (b.name.contains(keyword)) {
-                        System.out.println("==== 검색 결과 ====");
-                        System.out.println("저자: " + b.writer);
-                        System.out.println("도서명: " + b.name);
-                        System.out.println("도서 번호: " + b.number);
-
-                        if (b.review.isEmpty()) {
-                            System.out.println("후기: 없음");
-                        } else {
-                            for (int r = 0; r < b.review.size(); r++) {
-                                System.out.println("후기 " + (r + 1) + ": " + b.review.get(r));
-                            }
+                    if (b.review.isEmpty()) {
+                        System.out.println("후기: 없음");
+                    } else {
+                        for (int r = 0; r < b.review.size(); r++) {
+                            System.out.println("후기 " + (r + 1) + ": " + b.review.get(r));
                         }
-
-                        found = true;
                     }
+                    found = true;
                 }
             }
 
@@ -79,9 +77,9 @@ public class Book {
 
         Book SelectBook = null;
 
-        for (int i = 0; i < books.size(); i++) {
-            if (books.get(i).name.equals(reviewBookName)) {
-                SelectBook = books.get(i);
+        for (Book b : books) {
+            if (b.name.equals(reviewBookName)) {
+                SelectBook = b;
                 break;
             }
         }
@@ -98,6 +96,44 @@ public class Book {
                 SelectBook.review.add(input);
                 System.out.println("후기가 추가되었습니다 (종료: 빈칸 입력)");
             }
+        }
+    }
+
+    public static void saveBooks() {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE_NAME))) {
+            for (Book b : books) {
+                String reviewStr = String.join(";", b.review);
+                bw.write(b.writer + "," + b.name + "," + b.number + "," + reviewStr);
+                bw.newLine();
+            }
+        } catch (IOException e) {
+            System.out.println("파일 저장 중 오류 발생");
+        }
+    }
+
+    public static void loadBooks() {
+
+        File file = new File(FILE_NAME);
+        if (!file.exists()) return;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(FILE_NAME))) {
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                String[] data = line.split(",", -1);
+
+                Book b = new Book(data[0], data[1], data[2]);
+
+                if (!data[3].isEmpty()) {
+                    String[] reviews = data[3].split(";");
+                    for (String r : reviews) b.review.add(r);
+                }
+
+                books.add(b);
+            }
+
+        } catch (IOException e) {
+            System.out.println("파일 로드 중 오류 발생");
         }
     }
 }
